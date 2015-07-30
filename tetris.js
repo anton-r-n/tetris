@@ -37,7 +37,8 @@ Tetris.prototype.draw = function() {
   for (var y = 0; y < this.height; y++) {
     html.push('<div class="row">');
     for (var x = 0; x < this.width; x++) {
-      html.push('<span></span>');
+      var type = Math.round(Math.random() * 7);
+      html.push('<span class="cell_', type, '"></span>');
     }
     html.push('</div>');
   }
