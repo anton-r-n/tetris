@@ -28,7 +28,7 @@ body {
   line-height: 0;
 }
 
-.matrix span {
+.cell {
   display: inline-block;
   width: 20px;
   height: 20px;
@@ -37,7 +37,7 @@ body {
   border-width: 2px;
 }
 
-.matrix span.cell_0 { /* default empty */
+.cell_0 { /* default empty */
   border-width: 1px;
   border-color: transparent #808080 #808080 transparent;
 }
