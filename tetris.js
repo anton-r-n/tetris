@@ -16,18 +16,30 @@ function Tetris() {}
 Tetris.prototype.init = function(parent_node) {
   this.width = 10;
   this.height = 20;
-  this.elt = parent_node;
 
-  this.draw();
+  this.elt = parent_node;
+  this.board = new Board().init(this.height, this.width);
+
+  this.next = Shape.random();
+  this.pushShape(Shape.random());
+
+  this.draw(this.board.apply(this.current));
 
   return this;
+};
+
+
+Tetris.prototype.pushShape = function(shape) {
+  this.current = this.next;
+  this.next = shape;
+  this.current.x = Math.floor((this.width - this.current.size) / 2);
 };
 
 
 /**
  * Draw all elements of the game
  */
-Tetris.prototype.draw = function() {
+Tetris.prototype.draw = function(board) {
   var html = [];
   html.push(
       '<div class="border">',
@@ -37,8 +49,7 @@ Tetris.prototype.draw = function() {
   for (var y = 0; y < this.height; y++) {
     html.push('<div class="row">');
     for (var x = 0; x < this.width; x++) {
-      var type = Math.round(Math.random() * 7);
-      html.push('<span class="cell cell_', type, '"></span>');
+      html.push('<span class="cell cell_', board[y][x], '"></span>');
     }
     html.push('</div>');
   }
@@ -52,21 +63,57 @@ Tetris.prototype.draw = function() {
 /**
  * @constructor
  */
-function Shape() {}
+function Board() {}
 
 
 /**
- * Preset of all shapes
+ * Create new board
+ * @return {Array<Array>} board.
  */
-Shape.preset = [
-  [[0, 0, 0, 0], [0, 0, 0, 0], [1, 1, 1, 1], [0, 0, 0, 0]],
-  [[2, 0, 0], [2, 2, 2], [0, 0, 0]],
-  [[0, 0, 3], [3, 3, 3], [0, 0, 0]],
-  [[4, 4], [4, 4]],
-  [[0, 5, 5], [5, 5, 0], [0, 0, 0]],
-  [[6, 6, 6], [0, 6, 0], [0, 0, 0]],
-  [[7, 7, 0], [0, 7, 7], [0, 0, 0]]
-];
+Board.prototype.init = function(height, width) {
+  this.cells = [];
+  for (var y = 0; y < height; y++) {
+    this.cells[y] = [];
+    for (var x = 0; x < width; x++) {
+      this.cells[y][x] = 0;
+    }
+  }
+  return this;
+};
+
+
+/**
+ * Apply shape to the board
+ * @param {Object<Shape>} shape Current shape.
+ * @return {Array<Array>} new_board The board clone with applied shape.
+ */
+Board.prototype.apply = function(shape) {
+  /* Clone board */
+  var board = this.cells.map(function(row) { return row.slice() }),
+      height = board.length,
+      width = board[0].length;
+
+  /* Apply */
+  for (var y = 0; y < shape.size; y++) {
+    for (var x = 0; x < shape.size; x++) {
+      var y1 = y + shape.y,
+          x1 = x + shape.x,
+          val = shape.tiles[y][x];
+      if (val > 0 && y1 >= 0 && y1 < height && x1 >= 0 && x1 < width) {
+        board[y1][x1] = val;
+      }
+    }
+  }
+
+  return board;
+};
+
+
+
+/**
+ * @constructor
+ */
+function Shape() {}
 
 
 /**
@@ -84,11 +131,25 @@ Shape.prototype.init = function(idx) {
 
 
 /**
+ * Preset of all shapes
+ */
+Shape.preset = [
+  [[0, 0, 0, 0], [1, 1, 1, 1], [0, 0, 0, 0], [0, 0, 0, 0]],
+  [[2, 0, 0], [2, 2, 2], [0, 0, 0]],
+  [[0, 0, 3], [3, 3, 3], [0, 0, 0]],
+  [[4, 4], [4, 4]],
+  [[0, 5, 5], [5, 5, 0], [0, 0, 0]],
+  [[6, 6, 6], [0, 6, 0], [0, 0, 0]],
+  [[7, 7, 0], [0, 7, 7], [0, 0, 0]]
+];
+
+
+/**
  * Init random shape
  * @return {Object} instance.
  */
-Shape.prototype.init_random = function() {
-  return this.init(Math.round(Math.random() * Shape.preset.length));
+Shape.random = function() {
+  return new Shape().init(Math.floor(Math.random() * Shape.preset.length));
 };
 
 

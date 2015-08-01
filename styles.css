@@ -38,8 +38,8 @@ body {
 }
 
 .cell_0 { /* default empty */
-  border-width: 1px;
-  border-color: transparent #808080 #808080 transparent;
+  border-width: 0 1px 1px 0;
+  border-color: #808080;
 }
 
 .cell_1 { /* teal */
