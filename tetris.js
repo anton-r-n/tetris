@@ -14,6 +14,7 @@ function Tetris() {}
  * @return {Object} instance.
  */
 Tetris.prototype.init = function(parent_node) {
+  this.scores = 0;
   this.width = 10;
   this.height = 20;
   this.interval = 500;
@@ -57,6 +58,7 @@ Tetris.prototype.step = function() {
   }
   else {
     this.board.cells = this.board.apply(this.current);
+    this.clearLines();
     this.pushShape(Shape.random());
     this.current._y = this.current.y + 1;
     if (this.board.validate(this.current)) {
@@ -64,6 +66,19 @@ Tetris.prototype.step = function() {
     }
     else {
       console.log('stop');
+    }
+  }
+};
+
+
+Tetris.prototype.clearLines = function() {
+  for (var y = 0; y < this.height; y++) {
+    if (this.board.cells[y].indexOf(0) === -1) {
+      this.board.cells.splice(y, 1);
+      this.scores += 10;
+      for (var i = 0, row = []; i < this.width; i++) { row[i] = 0 }
+      this.board.cells.unshift(row);
+      y--;
     }
   }
 };
