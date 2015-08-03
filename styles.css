@@ -1,0 +1,131 @@
+body {
+  background-color: #ccc;
+  text-align: center;
+  padding: 0;
+  margin: 0;
+  font-size: 13px;
+  font-family: 'Helvetica', 'Arial', sans-serif;
+}
+
+.Tetris {
+  padding: 10px;
+}
+
+.border {
+  display: inline-block;
+  border-style: solid;
+  border-width: 2px;
+  border-color: #fff #808080 #808080 #fff;
+  padding: 7px;
+}
+
+.matrix {
+  display: inline-block;
+  vertical-align: top;
+  border-style: solid;
+  border-width: 2px;
+  border-color: #808080 #fff #fff #808080;
+  position: relative;
+  line-height: 0;
+}
+
+.cell {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  box-sizing: border-box;
+  border-style: solid;
+  border-width: 2px;
+}
+
+.cell_0 { /* default empty */
+  border-width: 0 1px 1px 0;
+  border-color: #808080;
+}
+
+.cell_1 { /* teal */
+  background-color: #009688;
+  border-color: #80cbc4 #00695c #00695c #80cbc4;
+}
+
+.cell_2 { /* blue */
+  background-color: #2196f3;
+  border-color: #64b5f6 #0d47a1 #0d47a1 #64b5f6;
+}
+
+.cell_3 { /* orange */
+  background-color: #fb8c00;
+  border-color: #ffb74d #e65100 #e65100 #ffb74d;
+}
+
+.cell_4 { /* yellow */
+  background-color: #fdd835;
+  border-color: #fff59d #f57f17 #f57f17 #fff59d;
+}
+
+.cell_5 { /* green */
+  background-color: #c0ca33;
+  border-color: #e6ee9c #827717 #827717 #e6ee9c;
+}
+
+.cell_6 { /* purple */
+  background-color: #7e57c2;
+  border-color: #9575cd #311b92 #311b92 #9575cd;
+}
+
+.cell_7 { /* red */
+  background-color: #f44336;
+  border-color: #ef9a9a #b71c1c #b71c1c #ef9a9a;
+}
+
+.panel {
+  display: inline-block;
+  vertical-align: top;
+  font-size: 14px;
+  line-height: 20px;
+  margin: 2px;
+}
+
+.section {
+  margin-top: 20px;
+}
+
+.label {
+  width: 4em;
+  text-align: left;
+  margin-left: 16px;
+  display: inline-block;
+}
+
+.value {
+  width: 3em;
+  text-align: right;
+  margin-right: 9px;
+  display: inline-block;
+}
+
+.next {
+  width: 100px;
+  height: 80px;
+  margin-top: 38px;
+  margin-left: 7px;
+}
+
+.next .cell_0 {
+  border: none;
+}
+
+.button {
+  padding: 0;
+  line-height: 26px;
+  margin-left: 7px;
+  margin-top: 92px;
+  width: 100px;
+  cursor: pointer;
+}
+
+.button:active {
+  width: 102px;
+  line-height: 28px;
+  border-width: 1px;
+}
