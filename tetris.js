@@ -19,18 +19,30 @@ Tetris.prototype.init = function(parent_node) {
   this.lines = 0;
   this.width = 10;
   this.height = 20;
-  this.interval = 500;
-
+  this.active = 0;
+  this.action = 'Start';
   this.elt = parent_node;
   this.board = new Board().init(this.height, this.width);
+  document.addEventListener('keydown', this.keydown.bind(this));
+  document.addEventListener('mousedown', this.click.bind(this));
+  this.draw(this.board.cells);
 
+  return this;
+};
+
+
+/**
+ * Start new game
+ */
+Tetris.prototype.start = function() {
+  this.score = 0;
+  this.level = 0;
+  this.lines = 0;
+  this.interval = 500;
+  this.board = new Board().init(this.height, this.width);
   this.next = Shape.random();
   this.pushShape(Shape.random());
   this.step();
-
-  document.addEventListener('keydown', this.move.bind(this));
-
-  return this;
 };
 
 
@@ -56,7 +68,7 @@ Tetris.prototype.step = function() {
   if (this.board.validate(this.current)) {
     this.current.y += 1;
     this.draw(this.board.apply(this.current));
-    setTimeout(this.step.bind(this), this.interval);
+    this.active = setTimeout(this.step.bind(this), this.interval);
   }
   else {
     this.board.cells = this.board.apply(this.current);
@@ -67,7 +79,10 @@ Tetris.prototype.step = function() {
       this.step();
     }
     else {
-      console.log('stop');
+      this.action = 'Start';
+      clearTimeout(this.active);
+      this.draw(this.board.apply(this.current));
+      delete this.current;
     }
   }
 };
@@ -82,6 +97,8 @@ Tetris.prototype.clearLines = function() {
       this.board.cells.splice(y, 1);
       this.score += 10;
       this.lines += 1;
+      this.level = Math.floor(this.score / 100);
+      this.interval = 500 / Math.pow(2, this.level);
       for (var i = 0, row = []; i < this.width; i++) { row[i] = 0 }
       this.board.cells.unshift(row);
       y--;
@@ -91,11 +108,48 @@ Tetris.prototype.clearLines = function() {
 
 
 /**
- * Process keypress
+ * Toggle game state
+ */
+Tetris.prototype.toggleState = function() {
+  if (this.action === 'Start') {
+    this.action = 'Pause';
+    this.start();
+  }
+  else if (this.action === 'Pause') {
+    this.action = 'Continue';
+    clearTimeout(this.active);
+    this.draw(this.board.apply(this.current));
+  }
+  else {
+    this.action = 'Pause';
+    this.step();
+  }
+};
+
+
+/**
+ * Process click
  * @param {Object} e Event.
  */
-Tetris.prototype.move = function(e) {
+Tetris.prototype.click = function(e) {
+  if (e.target.id === 'action') {
+    this.toggleState();
+  }
+};
+
+
+/**
+ * Process keydown
+ * @param {Object} e Event.
+ */
+Tetris.prototype.keydown = function(e) {
+  if (e.which !== 13 && !this.current) {
+    return;
+  }
   switch (e.which) {
+    case 13: /* enter */
+      this.toggleState();
+      break;
     case 37: /* left */
       this.current._x = this.current.x - 1;
       if (this.board.validate(this.current)) {
@@ -119,6 +173,7 @@ Tetris.prototype.move = function(e) {
         this.draw(this.board.apply(this.current));
       }
       break;
+    case 32: /* space (drop) */
     case 40: /* down (drop) */
       this.current._y = this.current.y + 1;
       while (this.board.validate(this.current)) {
@@ -156,7 +211,14 @@ Tetris.prototype.draw = function(board) {
     '<span class="label">Level</span>',
     '<span class="value">', this.level, '</span>',
     '</div>',
-    this._drawNext(this.next),
+    '<div class="matrix next">',
+    this.next ? this._drawNext(this.next) : '',
+    '</div>',
+    '<div class="section">',
+    '<div id="action" class="button border">',
+    this.action,
+    '</div>',
+    '</div>',
     '</div>',
     '</div>'
   ];
@@ -189,7 +251,7 @@ Tetris.prototype._drawBoard = function(board) {
  * @return {String} html.
  */
 Tetris.prototype._drawNext = function(shape) {
-  var html = ['<div class="matrix next">'];
+  var html = [];
   if (shape.size < 4) {
     html.push('<div class="row"><div class="cell cell_0"></div></div>');
   }
@@ -204,7 +266,6 @@ Tetris.prototype._drawNext = function(shape) {
     }
     html.push('</div>');
   }
-  html.push('</div>');
   return html.join('');
 };
 
