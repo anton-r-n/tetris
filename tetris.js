@@ -14,7 +14,9 @@ function Tetris() {}
  * @return {Object} instance.
  */
 Tetris.prototype.init = function(parent_node) {
-  this.scores = 0;
+  this.score = 0;
+  this.level = 0;
+  this.lines = 0;
   this.width = 10;
   this.height = 20;
   this.interval = 500;
@@ -71,11 +73,15 @@ Tetris.prototype.step = function() {
 };
 
 
+/**
+ * Clear lines filled with tiles
+ */
 Tetris.prototype.clearLines = function() {
   for (var y = 0; y < this.height; y++) {
     if (this.board.cells[y].indexOf(0) === -1) {
       this.board.cells.splice(y, 1);
-      this.scores += 10;
+      this.score += 10;
+      this.lines += 1;
       for (var i = 0, row = []; i < this.width; i++) { row[i] = 0 }
       this.board.cells.unshift(row);
       y--;
@@ -131,14 +137,40 @@ Tetris.prototype.move = function(e) {
 
 /**
  * Draw all elements of the game
+ * @param {Array} board Array of arrays of cells.
  */
 Tetris.prototype.draw = function(board) {
-  var html = [];
-  html.push(
-      '<div class="border">',
-      '<div class="matrix">'
-  );
+  var html = [
+    '<div class="border">',
+    this._drawBoard(board),
+    '<div class="panel">',
+    '<div class="section">',
+    '<span class="label">Score</span>',
+    '<span class="value">', this.score, '</span>',
+    '</div>',
+    '<div class="section">',
+    '<span class="label">Lines</span>',
+    '<span class="value">', this.lines, '</span>',
+    '</div>',
+    '<div class="section">',
+    '<span class="label">Level</span>',
+    '<span class="value">', this.level, '</span>',
+    '</div>',
+    this._drawNext(this.next),
+    '</div>',
+    '</div>'
+  ];
+  this.elt.innerHTML = html.join('');
+};
 
+
+/**
+ * Draw board
+ * @param {Array} board Array of arrays of cells.
+ * @return {String} html.
+ */
+Tetris.prototype._drawBoard = function(board) {
+  var html = ['<div class="matrix">'];
   for (var y = 0; y < this.height; y++) {
     html.push('<div class="row">');
     for (var x = 0; x < this.width; x++) {
@@ -146,9 +178,34 @@ Tetris.prototype.draw = function(board) {
     }
     html.push('</div>');
   }
+  html.push('</div>');
+  return html.join('');
+};
 
-  html.push('</div></div>');
-  this.elt.innerHTML = html.join('');
+
+/**
+ * Draw next shape
+ * @param {Object} shape Next shape.
+ * @return {String} html.
+ */
+Tetris.prototype._drawNext = function(shape) {
+  var html = ['<div class="matrix next">'];
+  if (shape.size < 4) {
+    html.push('<div class="row"><div class="cell cell_0"></div></div>');
+  }
+  for (var y = 0; y < shape.size; y++) {
+    html.push('<div class="row">');
+    for (var x = 0; x < shape.size; x++) {
+      html.push(
+          '<span class="cell cell_',
+          shape.tiles[y][x] ? shape.idx + 1 : 0,
+          '"></span>'
+      );
+    }
+    html.push('</div>');
+  }
+  html.push('</div>');
+  return html.join('');
 };
 
 
@@ -161,6 +218,8 @@ function Board() {}
 
 /**
  * Create new board
+ * @param {Number} height Board height.
+ * @param {Number} width Board width.
  * @return {Array<Array>} board.
  */
 Board.prototype.init = function(height, width) {
@@ -267,6 +326,7 @@ Shape.prototype.clone = function() {
 
 /**
  * Rotate clockwise;
+ * @return {Object} instance.
  */
 Shape.prototype.rotate = function() {
   var tiles = this.tiles.map(function(row) { return row.slice() });
